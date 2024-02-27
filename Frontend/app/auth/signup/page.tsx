@@ -3,11 +3,15 @@
 import google from "@/asset/Google-Logo.png";
 import Button from "@/components/button";
 import Image from "next/image";
-import React, { useState, FormEvent, ChangeEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import React, { useState, FormEvent, ChangeEvent } from "react";
+
+
 const page: React.FC = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const router = useRouter();
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setEmail(e.target.value);
@@ -15,6 +19,11 @@ const page: React.FC = () => {
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setPassword(e.target.value);
+  };
+  const handleConfirmPasswordChange = (
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    setConfirmPassword(e.target.value);
   };
 
   const handleSubmit = (e: FormEvent): void => {
@@ -54,7 +63,7 @@ const page: React.FC = () => {
               </div>
             </div>
 
-            <div>
+                  <div>
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
@@ -66,7 +75,7 @@ const page: React.FC = () => {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   value={password}
                   onChange={handlePasswordChange}
@@ -77,28 +86,28 @@ const page: React.FC = () => {
 
             <div>
               <label
-                htmlFor="password"
+                htmlFor="confirmPassword"
                 className="block text-sm font-medium text-gray-700"
               >
                 Confirm Password
               </label>
               <div className="mt-1">
                 <input
-                  id="password"
-                  name="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
-                  value={password}
-                  onChange={handlePasswordChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-5"
                 />
               </div>
             </div>
             
 
            
-            <Button text="Sign up" width="w-full" />
+            <Link href="/auth/otp-verification"><Button text="Sign up" width="w-full" /></Link>
             <button
               type="button"
               className="w-full flex justify-center  py-1 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
