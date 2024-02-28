@@ -1,26 +1,51 @@
-"use client"; 
-import React, { useState, FormEvent, ChangeEvent } from "react";
-import Button from "@/components/button";
-import Image from "next/image";
-import google from "@/asset/Google-logo.png"
-import { useRouter } from "next/navigation";
-const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const router = useRouter();
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setEmail(e.target.value);
-  };
+"use client";
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setPassword(e.target.value);
+import google from "@/asset/Google-logo.png";
+import Button from "@/components/button";
+import { useSigninMutation } from "@/store/auth/page";
+import { userLoginReturnObjectType } from "@/types/user/types";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useState, FormEvent, ChangeEvent } from "react";
+
+
+const LoginPage: React.FC = () => {
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+  });
+
+  const router = useRouter();
+  const [signin, { isLoading, isError, data }] = useSigninMutation();
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setCredentials((prevCredentials) => ({
+      ...prevCredentials,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e: FormEvent): void => {
     e.preventDefault();
-    // Handle login logic here
-  };
 
+    console.log("Sign-in form submitted");
+
+    signin(credentials)
+      .unwrap()
+      .then((response: userLoginReturnObjectType) => {
+        console.log("Sign-in successful");
+        // console.log("Response:", response);
+
+      
+        router.push("/TravelHistory/userpage");
+
+       
+        localStorage.setItem("user", JSON.stringify(response.token));
+      })
+      .catch((error) => {
+        console.log("Sign-in error:", error.message);
+      });
+  };
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -46,8 +71,8 @@ const LoginPage: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  value={email}
-                  onChange={handleEmailChange}
+                  // value={email}
+                  onChange={ handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
@@ -67,8 +92,8 @@ const LoginPage: React.FC = () => {
                   type="password"
                   autoComplete="current-password"
                   required
-                  value={password}
-                  onChange={handlePasswordChange}
+                  // value={password}
+                  onChange={ handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
@@ -111,7 +136,7 @@ const LoginPage: React.FC = () => {
                 className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 onClick = {() => {router.push('/auth/signup')}}
              >
-                Sign up
+                {isLoading ? "Signing in . . ." : "Signin"}
               </button>
       </div>
       </div>

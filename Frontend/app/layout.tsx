@@ -1,7 +1,11 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { store } from '@/store/';
+import { Provider } from "react-redux";
 
+import StateProvider from "@/components/provider/StateProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,7 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <StateProvider>
+
       <body className={inter.className}>{children}</body>
+      </StateProvider>
     </html>
   );
 }

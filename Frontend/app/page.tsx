@@ -1,3 +1,4 @@
+"use client";
 import recommended1 from "@/asset/home_page.jpeg";
 import recommended2 from '@/asset/home_page_2.jpeg';
 import image from "@/asset/undraw_Exploring_re_grb8.png";
