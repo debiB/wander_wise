@@ -17,17 +17,16 @@ const transporter = nodemailer.createTransport({
 });
 
 async function signup(req, res) {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const otp = generateOTP(); // Generate OTP
-    const user = await User.create({ email, password: hashedPassword, otp, isVerified: false }); // Store OTP in the user's document
+    const otp = generateOTP();
+    const user = await User.create({ name, email, password: hashedPassword, otp, isVerified: false }); 
 
-    // Send OTP verification code
+    
     await sendOtpEmail(email, otp);
-
-    res.json({ message: 'Verification email has been sent' });
+    res.json({name, message: 'Verification email has been sent' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -55,7 +54,7 @@ async function verifyOtp(req, res) {
       return res.status(401).json({ error: 'Invalid email or OTP' });
     }
 
-    if (parseInt(user.otp) !== parseInt(otp)) {
+    if (user.otp !== otp) {
       return res.status(401).json({ error: 'Invalid OTP' });
     }
 
@@ -71,7 +70,7 @@ async function verifyOtp(req, res) {
 }
 
 async function login(req, res) {
-  const { email, password } = req.body;
+  const {email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -91,8 +90,8 @@ async function login(req, res) {
     }
 
     const token = generateAccessToken(user._id);
-
-    res.json({ token });
+    const name = user.name
+    res.json({ name, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });

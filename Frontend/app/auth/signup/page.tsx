@@ -2,33 +2,45 @@
 
 import google from "@/asset/Google-Logo.png";
 import Button from "@/components/button";
+import { useSignupMutation } from "@/store/auth/page";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 
 
-const page: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+const Page: React.FC = () => {
   const router = useRouter();
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setEmail(e.target.value);
+  const [credentials, setCredentials] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    setCredentials((prevCredentials) => ({
+      ...prevCredentials,
+      [name]: value,
+    }));
   };
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setPassword(e.target.value);
-  };
-  const handleConfirmPasswordChange = (
-    e: ChangeEvent<HTMLInputElement>
-  ): void => {
-    setConfirmPassword(e.target.value);
-  };
+  const [signup, { isLoading, isError, isSuccess, data }] = useSignupMutation();
 
-  const handleSubmit = (e: FormEvent): void => {
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-    // Handle login logic here
+
+    try {
+      const response = await signup(credentials);
+      if (isSuccess) {
+         router.push("/auth/otp-verification");
+      } else {
+        console.error("Signup failed:");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+    }
   };
 
   return (
@@ -44,6 +56,25 @@ const page: React.FC = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label
+                htmlFor="text"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Full Name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={credentials.name}
+                  onChange={handleInputChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+            </div>
+            <div>
+              <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
@@ -56,14 +87,14 @@ const page: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  value={email}
-                  onChange={handleEmailChange}
+                  value={credentials.email}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
             </div>
 
-                  <div>
+            <div>
               <label
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
@@ -77,8 +108,8 @@ const page: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  value={password}
-                  onChange={handlePasswordChange}
+                  value={credentials.password}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 />
               </div>
@@ -98,16 +129,19 @@ const page: React.FC = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  value={confirmPassword}
-                  onChange={handleConfirmPasswordChange}
+                  value={credentials.confirmPassword}
+                  onChange={handleInputChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-5"
                 />
               </div>
             </div>
-            
 
-           
-            <Link href="/auth/otp-verification"><Button text="Sign up" width="w-full" /></Link>
+            <button
+        className= "bg-button_c  hover:bg-button_c_hover text-white py-2 px-4 rounded-lg w-full" type="submit"
+      >
+        Sign up
+      </button>
+
             <button
               type="button"
               className="w-full flex justify-center  py-1 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -132,7 +166,9 @@ const page: React.FC = () => {
             <button
               type="button"
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick = {() => {router.push('/auth/signin')}}
+              onClick={() => {
+                router.push("/auth/signin");
+              }}
             >
               Sign in
             </button>
@@ -143,4 +179,4 @@ const page: React.FC = () => {
   );
 };
 
-export default page;
+export default Page;

@@ -5,3 +5,9 @@ export interface userLogin {
 export interface userLoginReturnObjectType {
   token: string;  
 }
+export interface OtpVerificationPayload {
+  otp: string;
+}
+export interface OtpVerificationPayloadResponse {
+  otp: string;
+}

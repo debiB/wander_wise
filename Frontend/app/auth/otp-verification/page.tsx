@@ -8,13 +8,13 @@ import React, {
   ChangeEvent,
   useRef,
 } from "react";
-
+import { useOtpVerificationMutation } from "@/store/auth/page";
 const OTPVerificationPage: React.FC = () => {
   const [otp, setOTP] = useState<string[]>(Array(4).fill(""));
   const [countdown, setCountdown] = useState<number>(60);
   const router = useRouter();
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-
+  const [verifyOTP, { isLoading, isError, isSuccess, data }] = useOtpVerificationMutation();
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => {
@@ -53,11 +53,24 @@ const OTPVerificationPage: React.FC = () => {
     // Handle resend logic here
   };
 
-  const handleSubmit = (e: FormEvent): void => {
-    e.preventDefault();
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+  e.preventDefault();
+
+  try {
     const enteredOTP = otp.join("");
-    // Handle OTP verification logic here
-  };
+    const response = await verifyOTP({ otp: enteredOTP });
+    if (isSuccess) {
+      router.push("/dashboard");
+    } else {
+      console.error("OTP verification failed");
+      // Handle error state or display error message to the user
+    }
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    // Handle error state or display error message to the user
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
