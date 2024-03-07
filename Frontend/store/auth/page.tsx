@@ -1,8 +1,4 @@
-import {
-  userLogin,
-  userLoginReturnObjectType,
-  OtpVerificationPayload,
-} from "@/types/user/types";
+import { userLogin, userLoginReturnObjectType, OtpVerificationPayload } from "@/types/user/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
@@ -26,9 +22,16 @@ export const userAPI = createApi({
         body: data,
       }),
     }),
-    otpVerification: builder.mutation<{message: String}, OtpVerificationPayload>({
+    otpVerification: builder.mutation<{ message: String },OtpVerificationPayload>({
       query: (data) => ({
         url: "/auth//verify-otp",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    resendOtp: builder.mutation<{ message: String },{email:string}>({
+      query: (data) => ({
+        url: "/auth//resend-otp",
         method: "POST",
         body: data,
       }),
@@ -40,4 +43,5 @@ export const {
   useSigninMutation,
   useSignupMutation,
   useOtpVerificationMutation,
+  useResendOtpMutation,
 } = userAPI;

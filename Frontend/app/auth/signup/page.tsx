@@ -6,6 +6,7 @@ import { useSignupMutation } from "@/store/auth/page";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import querystring from 'querystring';
 import { useState, FormEvent, ChangeEvent } from "react";
 
 
@@ -17,7 +18,7 @@ const Page: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
-
+const query = querystring.stringify({ email: credentials.email });
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setCredentials((prevCredentials) => ({
@@ -34,7 +35,7 @@ const Page: React.FC = () => {
     try {
       const response = await signup(credentials);
       if (isSuccess) {
-         router.push("/auth/otp-verification");
+        router.push(`/auth/otp-verification?${query}`);
       } else {
         console.error("Signup failed:");
       }
@@ -137,10 +138,11 @@ const Page: React.FC = () => {
             </div>
 
             <button
-        className= "bg-button_c  hover:bg-button_c_hover text-white py-2 px-4 rounded-lg w-full" type="submit"
-      >
-        Sign up
-      </button>
+              className="bg-button_c  hover:bg-button_c_hover text-white py-2 px-4 rounded-lg w-full"
+              type="submit" onClick={handleSubmit}
+            >
+              Sign up
+            </button>
 
             <button
               type="button"

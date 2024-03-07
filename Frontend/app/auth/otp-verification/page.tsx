@@ -1,6 +1,11 @@
 "use client";
+
 import Button from "@/components/button";
-import { useRouter } from "next/navigation";
+import {
+  useOtpVerificationMutation,
+  useResendOtpMutation,
+} from "@/store/auth/page";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, {
   useState,
   useEffect,
@@ -8,13 +13,19 @@ import React, {
   ChangeEvent,
   useRef,
 } from "react";
-import { useOtpVerificationMutation } from "@/store/auth/page";
+
 const OTPVerificationPage: React.FC = () => {
   const [otp, setOTP] = useState<string[]>(Array(4).fill(""));
-  const [countdown, setCountdown] = useState<number>(60);
+  const [countdown, setCountdown] = useState<number>(180);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
+  const emailString = Array.isArray(email) ? email[0] : email || "";
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const [verifyOTP, { isLoading, isError, isSuccess, data }] = useOtpVerificationMutation();
+  const [verifyOTP, { isLoading, isError, isSuccess, data }] =
+    useOtpVerificationMutation();
+  const [resendOTP, { isLoading: resendLoading }] = useResendOtpMutation();
+
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => {
@@ -48,29 +59,33 @@ const OTPVerificationPage: React.FC = () => {
     }
   };
 
-  const handleResend = (): void => {
-    setCountdown(60);
-    // Handle resend logic here
+  const handleResend = async (): Promise<void> => {
+    try {
+      await resendOTP({ email: emailString });
+      setCountdown(180);
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      
+    }
   };
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    const enteredOTP = otp.join("");
-    const response = await verifyOTP({ otp: enteredOTP });
-    if (isSuccess) {
-      router.push("/dashboard");
-    } else {
-      console.error("OTP verification failed");
-      // Handle error state or display error message to the user
+    try {
+      const enteredOTP = otp.join("");
+      const response = await verifyOTP({ email: emailString, otp: enteredOTP });
+      if (isSuccess) {
+        router.push("/dashboard");
+      } else {
+        console.error("OTP verification failed");
+        
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      
     }
-  } catch (error) {
-    console.error("OTP verification error:", error);
-    // Handle error state or display error message to the user
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -105,15 +120,25 @@ const OTPVerificationPage: React.FC = () => {
             ) : (
               <p className="text-center">
                 <a
-                  className="text-indigo-500 cursor-pointer"
+                  className={`text-indigo-500 cursor-pointer ${
+                    resendLoading ? "pointer-events-none" : ""
+                  }`}
                   onClick={handleResend}
                 >
-                  Resend
+                  Resend OTP
                 </a>
               </p>
             )}
 
-            <Button text="Verify OTP" width="w-full" />
+            <div>
+              <button
+                type="submit"
+                className="w-full bg-button_c hover:bg-button_c_hover text-white py-2 px-4 rounded-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Verifying..." : "Verify OTP"}
+              </button>
+            </div>
           </form>
         </div>
       </div>

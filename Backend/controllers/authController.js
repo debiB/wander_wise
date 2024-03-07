@@ -22,11 +22,11 @@ async function signup(req, res) {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = generateOTP();
-    const user = await User.create({ name, email, password: hashedPassword, otp, isVerified: false }); 
+    const otpCreatedAt = new Date(); // Current timestamp
+    const user = await User.create({ name, email, password: hashedPassword, otp, otpCreatedAt, isVerified: false }); 
 
-    
     await sendOtpEmail(email, otp);
-    res.json({name, message: 'Verification email has been sent' });
+    res.json({ name, message: 'Verification email has been sent' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -58,11 +58,41 @@ async function verifyOtp(req, res) {
       return res.status(401).json({ error: 'Invalid OTP' });
     }
 
+    // Check if the OTP is still valid (within 3 minutes)
+    const currentTime = new Date();
+    const otpExpirationTime = new Date(user.otpCreatedAt.getTime() + 3 * 60 * 1000); // Add 3 minutes to the OTP creation time
+    if (currentTime > otpExpirationTime) {
+      return res.status(401).json({ error: 'OTP has expired' });
+    }
+
     // Update the user document to mark email as verified
     user.isVerified = true;
     await user.save();
 
     res.json({ message: 'Email verified successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+async function resendOtp(req, res) {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email' });
+    }
+
+    const otp = generateOTP();
+    const otpCreatedAt = new Date(); // Current timestamp
+    user.otp = otp;
+    user.otpCreatedAt = otpCreatedAt;
+    await user.save();
+
+    await sendOtpEmail(email, otp);
+    res.json({ message: 'New OTP has been sent' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
@@ -98,4 +128,4 @@ async function login(req, res) {
   }
 }
 
-module.exports = { signup, verifyOtp, login };
+module.exports = { signup, verifyOtp, login, resendOtp };
