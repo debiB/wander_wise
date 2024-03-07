@@ -1,6 +1,6 @@
 "use client";
 
-import Button from "@/components/button";
+import {Button} from "@/components/ui/button";
 import {
   useOtpVerificationMutation,
   useResendOtpMutation,
@@ -13,6 +13,7 @@ import React, {
   ChangeEvent,
   useRef,
 } from "react";
+import Link from "next/link";
 
 const OTPVerificationPage: React.FC = () => {
   const [otp, setOTP] = useState<string[]>(Array(4).fill(""));
@@ -130,15 +131,10 @@ const OTPVerificationPage: React.FC = () => {
               </p>
             )}
 
-            <div>
-              <button
-                type="submit"
-                className="w-full bg-button_c hover:bg-button_c_hover text-white py-2 px-4 rounded-lg"
-                disabled={isLoading}
-              >
-                {isLoading ? "Verifying..." : "Verify OTP"}
-              </button>
-            </div>
+            
+              <Button type="submit" className="w-full" disabled={isLoading}>{isLoading ? "Verifying..." : "Verify OTP"} </Button>
+              
+           
           </form>
         </div>
       </div>

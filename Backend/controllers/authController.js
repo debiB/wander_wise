@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const nodemailer = require("nodemailer");
 const { generateOTP } = require('../utils/OTPgenerator.js');
@@ -44,6 +43,12 @@ async function sendOtpEmail(email, otp) {
   await transporter.sendMail(mailOptions);
 }
 
+function isOtpExpired(otpCreatedAt) {
+  const currentTime = new Date();
+  const otpExpirationTime = new Date(otpCreatedAt.getTime() + 3 * 60 * 1000); // Add 3 minutes to the OTP creation time
+  return currentTime > otpExpirationTime;
+}
+
 async function verifyOtp(req, res) {
   const { email, otp } = req.body;
 
@@ -58,10 +63,7 @@ async function verifyOtp(req, res) {
       return res.status(401).json({ error: 'Invalid OTP' });
     }
 
-    // Check if the OTP is still valid (within 3 minutes)
-    const currentTime = new Date();
-    const otpExpirationTime = new Date(user.otpCreatedAt.getTime() + 3 * 60 * 1000); // Add 3 minutes to the OTP creation time
-    if (currentTime > otpExpirationTime) {
+    if (isOtpExpired(user.otpCreatedAt)) {
       return res.status(401).json({ error: 'OTP has expired' });
     }
 
@@ -75,6 +77,7 @@ async function verifyOtp(req, res) {
     res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 async function resendOtp(req, res) {
   const { email } = req.body;
 
@@ -99,8 +102,10 @@ async function resendOtp(req, res) {
   }
 }
 
+
+
 async function login(req, res) {
-  const {email, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -120,7 +125,7 @@ async function login(req, res) {
     }
 
     const token = generateAccessToken(user._id);
-    const name = user.name
+    const name = user.name;
     res.json({ name, token });
   } catch (error) {
     console.error(error);
@@ -128,4 +133,4 @@ async function login(req, res) {
   }
 }
 
-module.exports = { signup, verifyOtp, login, resendOtp };
+module.exports = { signup, verifyOtp, login, resendOtp, forgotPassword };

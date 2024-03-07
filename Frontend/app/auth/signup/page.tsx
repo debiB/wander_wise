@@ -1,7 +1,7 @@
 "use client";
 
 import google from "@/asset/Google-Logo.png";
-import Button from "@/components/button";
+import {Button} from "@/components/ui/button";
 import { useSignupMutation } from "@/store/auth/page";
 import Image from "next/image";
 import Link from "next/link";
@@ -137,22 +137,14 @@ const query = querystring.stringify({ email: credentials.email });
               </div>
             </div>
 
-            <button
-              className="bg-button_c  hover:bg-button_c_hover text-white py-2 px-4 rounded-lg w-full"
+            <Button
+              className="w-full"
               type="submit" onClick={handleSubmit}
             >
               Sign up
-            </button>
+            </Button>
 
-            <button
-              type="button"
-              className="w-full flex justify-center  py-1 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <div className="flex items-center justify-center ">
-                <Image src={google} alt="google" width={40} height={40} />
-                <p className="ml-3">Sign up with Google</p>
-              </div>
-            </button>
+           
           </form>
           <div className="mt-6">
             <div className="relative mb-10">
@@ -165,15 +157,8 @@ const query = querystring.stringify({ email: credentials.email });
                 </span>
               </div>
             </div>
-            <button
-              type="button"
-              className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              onClick={() => {
-                router.push("/auth/signin");
-              }}
-            >
-              Sign in
-            </button>
+            <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"><Link href="/auth/signin">Sign in</Link></Button>
+
           </div>
         </div>
       </div>

@@ -1,9 +1,11 @@
 "use client";
-import Button from "./button";
+
+import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import React, { useState } from "react";
-import Link from "next/link"; 
+
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -12,21 +14,29 @@ const NavBar = () => {
   };
 
   return (
-    <div className=" py-4">
-      <div className="sticky container mx-auto flex justify-between items-center">
-        <div className="text-xl font-bold md:ml-1 ml-16">Wander Wise</div>
-        <div className="hidden md:flex items-center space-x-10">
+    <div className=" w-full py-10">
+      <div className="sticky container  flex justify-between items-center">
+        <div className="text-xl font-bold md:ml-0 ml-16">Wander Wise</div>
+        <div className="hidden md:flex items-center space-x-14">
           {" "}
-          {/* Added 'hidden' class for mobile */}
-          <ul className="flex space-x-10">
-            <li className="cursor-pointer"><a className="bg-hover-blue hover:text-blue-500">About us</a></li>{" "}
-            {/* Added 'cursor-pointer' class for better UX */}
-            <li className="cursor-pointer"><a className="bg-hover-blue hover:text-blue-500">Contact us</a></li>{" "}
-            {/* Added 'cursor-pointer' class for better UX */}
+          
+          <ul className="flex space-x-14">
+            <li className="cursor-pointer">
+              <a className="bg-hover-blue hover:text-blue-500">About us</a>
+            </li>{" "}
+           
+            <li className="cursor-pointer">
+              <a className="bg-hover-blue hover:text-blue-500">Contact us</a>
+            </li>{" "}
+            
           </ul>
-          <div className="flex space-x-10">
-            <Link href="/auth/signin"><Button text="Log in" width="4/12" /></Link>
-           <Link href="/auth/signup"><Button text="Sign up" width="4/12" /></Link> 
+          <div className="flex space-x-14">
+            <Link href="/auth/signin">
+              <Button>Log in</Button>
+            </Link>
+            <Link href="/auth/signup">
+              <Button>Sign up</Button>
+            </Link>
           </div>
         </div>
         <div className="md:hidden flex items-center mr-5">
@@ -45,19 +55,25 @@ const NavBar = () => {
             <X size={30} />
           </button>
           <ul className="block">
-            <li className="cursor-pointer mb-5"><a className="bg-hover-blue hover:text-blue-500">About us</a></li>{" "}
-            {/* Added 'cursor-pointer' class for better UX */}
-            <li className="cursor-pointer mb-5"><a className="bg-hover-blue hover:text-blue-500">Contact us</a></li>{" "}
-            {/* Added 'cursor-pointer' class for better UX */}
+            <li className="cursor-pointer mb-5">
+              <a className="bg-hover-blue hover:text-blue-500">About us</a>
+            </li>{" "}
+            
+            <li className="cursor-pointer mb-5">
+              <a className="bg-hover-blue hover:text-blue-500">Contact us</a>
+            </li>{" "}
+           
           </ul>
           <div className="block">
             <div className="mb-5">
-
-            <Button text="Log in" width="4/12" />
+              <Link href="/auth/signin">
+                <Button>Log in</Button>
+              </Link>
             </div>
-            <div >
-
-            <Button text="Sign up" width="4/12" />
+            <div>
+              <Link href="/auth/signup">
+                <Button>Sign up</Button>
+              </Link>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 const Footer = () => {
   return (
-    <div className="bg-button_c text-white py-10">
+    <div className="bg-primary text-white py-10">
   <div className="bg-button_c block md:flex md:justify-between items-center mt-10">
     <div className="bg-button_c text-xl font-bold ml-10">Wander Wise</div>
     <ul className="md:flex md:space-x-20 md:mr-20 md:mx-0 mx-auto">

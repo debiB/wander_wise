@@ -22,20 +22,24 @@ export const userAPI = createApi({
         body: data,
       }),
     }),
-    otpVerification: builder.mutation<{ message: String },OtpVerificationPayload>({
+    otpVerification: builder.mutation<
+      { message: String },
+      OtpVerificationPayload
+    >({
       query: (data) => ({
-        url: "/auth//verify-otp",
+        url: "/auth/verify-otp",
         method: "POST",
         body: data,
       }),
     }),
-    resendOtp: builder.mutation<{ message: String },{email:string}>({
+    resendOtp: builder.mutation<{ message: String }, { email: string }>({
       query: (data) => ({
-        url: "/auth//resend-otp",
+        url: "/auth/resend-otp",
         method: "POST",
         body: data,
       }),
     }),
+    
   }),
 });
 
@@ -44,4 +48,5 @@ export const {
   useSignupMutation,
   useOtpVerificationMutation,
   useResendOtpMutation,
+  
 } = userAPI;

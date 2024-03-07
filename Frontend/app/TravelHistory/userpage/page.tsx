@@ -1,9 +1,8 @@
 "use client";
 
 import NavBar from "@/components/NavBar";
-import Button from "@/components/button";
+import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
-
 
 const Page = () => {
   const [allowCustomDescription, setAllowCustomDescription] = useState(false);
@@ -13,8 +12,6 @@ const Page = () => {
     setAllowCustomDescription(!allowCustomDescription);
     setAllowGenerateButton(!allowGenerateButton);
   };
-
- 
 
   return (
     <div>
@@ -31,25 +28,33 @@ const Page = () => {
                   </div>
                   <p>Egypt is a nice place</p>
                 </div>
-               <div className="md:w-1/2 w-full md:ml-2 ml-0 bg-gray-100 p-4 rounded-lg mb-4">
+                <div className="md:w-1/2 w-full md:ml-2 ml-0 bg-gray-100 p-4 rounded-lg mb-4">
                   <div>
                     <h1 className="font-bold text-xl pb-2">Egypt</h1>
                   </div>
                   <p>Egypt is a nice place</p>
                 </div>
               </div>
-            
             </div>
           </div>
-            <div className="flex md:text-xl font-bold justify-center md:mt-20 mb-4 mt-10"> Want Know your destination?</div>
-            <p className="md:text-small flex md:justify-center mx-3 md:mb-20 mb-10 "> Generate your destination now. Either using your travel history or describing your preferences.</p>
-          {allowGenerateButton&& (
-          <div className="fixed bottom-0 left-0 w-full z-50">
-            <div className="flex justify-center my-4">
-               <Button text="Generate solely Based on your past experience" width="30" />
-            </div>
+          <div className="flex md:text-xl font-bold justify-center md:mt-20 mb-4 mt-10">
+            {" "}
+            Want Know your destination?
           </div>
-        )}
+          <p className="md:text-small flex md:justify-center mx-3 md:mb-20 mb-10 ">
+            {" "}
+            Generate your destination now. Either using your travel history or
+            describing your preferences.
+          </p>
+          {allowGenerateButton && (
+            <div className="fixed bottom-0 left-0 w-full z-50">
+              <div className="flex justify-center my-4">
+                <Button className="w-4/12">
+                  Generate solely Based on your travel history
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="flex justify-center my-8">
             <label
@@ -67,11 +72,9 @@ const Page = () => {
             </label>
           </div>
         </div>
-          </div>
-          
+      </div>
 
-          <div className="fixed bottom-0 left-0 w-full z-50">
-            
+      <div className="fixed bottom-0 left-0 w-full z-50">
         {allowCustomDescription && (
           <div className="py-4 fixed bottom-0 left-0 w-full z-50">
             <div className="flex max-w-3xl mx-auto px-4">
@@ -80,14 +83,11 @@ const Page = () => {
                 className="w-full bg-white border border-gray-300 rounded-lg px-4 py-2 mr-2"
                 placeholder="Enter your text here"
               />
-              <Button text="Send" width="10/12" />
+              <Button>Send</Button>
             </div>
           </div>
         )}
-
-      
       </div>
-      
     </div>
   );
 };
