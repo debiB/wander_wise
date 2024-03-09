@@ -1,13 +1,22 @@
 "use client";
 
+import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { useSigninMutation } from "@/store/auth/page";
 import { userLoginReturnObjectType } from "@/types/user/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import querystring from "querystring";
 import React, { useState, FormEvent, ChangeEvent } from "react";
-import querystring from 'querystring';
+import { useForm } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+
 
 const LoginPage: React.FC = () => {
   const [credentials, setCredentials] = useState({
@@ -19,7 +28,8 @@ const LoginPage: React.FC = () => {
     source: "signin",
   });
   const router = useRouter();
-  const [signin, { isLoading, isError, data }] = useSigninMutation();
+  const { toast } = useToast();
+  const [signin, { isLoading, isError, data, isSuccess }] = useSigninMutation();
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setCredentials((prevCredentials) => ({
@@ -27,26 +37,43 @@ const LoginPage: React.FC = () => {
       [name]: value,
     }));
   };
+  const formSchema = z.object({
+    email: z
+      .string({ required_error: "Email is required" })
+      .email({ message: "Please enter a valid email format" }),
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password must contain at least 8 characters" }),
+  });
 
-  const handleSubmit = (e: FormEvent): void => {
-    e.preventDefault();
-
-    console.log("Sign-in form submitted");
-
-    signin(credentials)
-      .unwrap()
-      .then((response: userLoginReturnObjectType) => {
-        console.log("Sign-in successful");
-        // console.log("Response:", response);
-
+  type FormType = z.infer<typeof formSchema>;
+  const form = useForm<FormType>({
+    resolver: zodResolver(formSchema),
+  });
+  const onSubmit: SubmitHandler<{ email: string; password: string }> = async (
+    data
+  ) => {
+    try {
+      const response = await signin(data);
+      if (isSuccess) {
+        toast({
+          description: "Sign successful!.",
+        });
         router.push("/TravelHistory/userpage");
-
-        localStorage.setItem("user", JSON.stringify(response.token));
-      })
-      .catch((error) => {
-        console.log("Sign-in error:", error.message);
+      } else if (isError) {
+        toast({
+          variant: "destructive",
+          description: "Sign in failed. Invalid credentials.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Sign in failed.",
       });
+    }
   };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -57,64 +84,65 @@ const LoginPage: React.FC = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  // value={email}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
+          <Form {...form}>
+            <form
+              className="space-y-6"
+              method="POST"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        className="font-semibold text-primary"
+                        placeholder="Email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  // value={password}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <PasswordInput
+                     
+                        className="font-semibold text-primary"
+                        placeholder="Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="text-right">
-              {" "}
-              {/* Add text-right class here */}
-              <Link
-                href={{
-                  pathname: "/auth/forgot-password-email",
-                query: query
-              }}
-                className="text-xs text-indigo-600 hover:text-indigo-500"
-              >
-                Forgot your password?
-              </Link>
-            </div>
-            <Button className="w-full" type="submit">Login</Button>
-          </form>
+              <div className="text-right">
+                {" "}
+                {/* Add text-right class here */}
+                <Link
+                  href={{
+                    pathname: "/auth/forgot-password-email",
+                    query: query,
+                  }}
+                  className="text-xs text-indigo-600 hover:text-indigo-500"
+                >
+                  Forgot your password?
+                </Link>
+              </div>
+              <Button className="w-full" type="submit">
+                Login
+              </Button>
+            </form>
+          </Form>
           <div className="mt-6">
             <div className="relative mb-10">
               <div className="absolute inset-0 flex items-center">
@@ -126,7 +154,9 @@ const LoginPage: React.FC = () => {
                 </span>
               </div>
             </div>
-            <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"><Link href="/auth/signup">Sign up</Link></Button>
+            <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <Link href="/auth/signup">Sign up</Link>
+            </Button>
           </div>
         </div>
       </div>
