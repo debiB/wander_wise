@@ -133,4 +133,4 @@ async function login(req, res) {
   }
 }
 
-module.exports = { signup, verifyOtp, login, resendOtp, forgotPassword };
+module.exports = { signup, verifyOtp, login, resendOtp};

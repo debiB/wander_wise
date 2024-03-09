@@ -21,6 +21,7 @@ const OTPVerificationPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
+  const source  = searchParams.get("source");
   const emailString = Array.isArray(email) ? email[0] : email || "";
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [verifyOTP, { isLoading, isError, isSuccess, data }] =
@@ -77,7 +78,10 @@ const OTPVerificationPage: React.FC = () => {
       const enteredOTP = otp.join("");
       const response = await verifyOTP({ email: emailString, otp: enteredOTP });
       if (isSuccess) {
-        router.push("/dashboard");
+        if (source === "signup") {
+          router.push("/TravelHistory/userpage");
+        } else
+        router.push("/auth/reset-password");
       } else {
         console.error("OTP verification failed");
         

@@ -1,17 +1,23 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import { useSigninMutation } from "@/store/auth/page";
 import { userLoginReturnObjectType } from "@/types/user/types";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useState, FormEvent, ChangeEvent } from "react";
-import Link from "next/link";
+import querystring from 'querystring';
+
 const LoginPage: React.FC = () => {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
-
+  const query = querystring.stringify({
+    email: credentials.email,
+    source: "signin",
+  });
   const router = useRouter();
   const [signin, { isLoading, isError, data }] = useSigninMutation();
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -98,7 +104,10 @@ const LoginPage: React.FC = () => {
               {" "}
               {/* Add text-right class here */}
               <Link
-                href="/auth/forgot-password-email"
+                href={{
+                  pathname: "/auth/forgot-password-email",
+                query: query
+              }}
                 className="text-xs text-indigo-600 hover:text-indigo-500"
               >
                 Forgot your password?

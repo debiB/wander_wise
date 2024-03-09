@@ -61,7 +61,7 @@ const page = () => {
                 <input
                   id="comfirm_password"
                   name="confirm_password"
-                  type="confirm_password"
+                  type="password"
                   autoComplete="current-password"
                   required
                   // value={password}

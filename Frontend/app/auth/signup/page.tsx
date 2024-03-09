@@ -18,7 +18,7 @@ const Page: React.FC = () => {
     password: "",
     confirmPassword: "",
   });
-const query = querystring.stringify({ email: credentials.email });
+const query = querystring.stringify({ email: credentials.email, source: "signup"});
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setCredentials((prevCredentials) => ({
