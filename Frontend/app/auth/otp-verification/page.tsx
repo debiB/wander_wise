@@ -1,10 +1,12 @@
 "use client";
 
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import {
   useOtpVerificationMutation,
   useResendOtpMutation,
 } from "@/store/auth/page";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
   useState,
@@ -13,7 +15,6 @@ import React, {
   ChangeEvent,
   useRef,
 } from "react";
-import Link from "next/link";
 
 const OTPVerificationPage: React.FC = () => {
   const [otp, setOTP] = useState<string[]>(Array(4).fill(""));
@@ -21,13 +22,13 @@ const OTPVerificationPage: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
-  const source  = searchParams.get("source");
+  const source = searchParams.get("source");
   const emailString = Array.isArray(email) ? email[0] : email || "";
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [verifyOTP, { isLoading, isError, isSuccess, data }] =
     useOtpVerificationMutation();
   const [resendOTP, { isLoading: resendLoading }] = useResendOtpMutation();
-
+  const { toast } = useToast();
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => {
@@ -67,7 +68,6 @@ const OTPVerificationPage: React.FC = () => {
       setCountdown(180);
     } catch (error) {
       console.error("Error resending OTP:", error);
-      
     }
   };
 
@@ -78,17 +78,23 @@ const OTPVerificationPage: React.FC = () => {
       const enteredOTP = otp.join("");
       const response = await verifyOTP({ email: emailString, otp: enteredOTP });
       if (isSuccess) {
+        toast({
+          description: "Email verification successful!.",
+        });
         if (source === "signup") {
           router.push("/TravelHistory/userpage");
-        } else
-        router.push("/auth/reset-password");
+        } else router.push("/auth/reset-password");
       } else {
-        console.error("OTP verification failed");
-        
+        toast({
+          variant: "destructive",
+          description: "OTP verification failed",
+        });
       }
     } catch (error) {
-      console.error("OTP verification error:", error);
-      
+      toast({
+        variant: "destructive",
+        description: "OTP verification error",
+      });
     }
   };
 
@@ -106,6 +112,7 @@ const OTPVerificationPage: React.FC = () => {
             <div className="flex justify-center space-x-2">
               {otp.map((digit, index) => (
                 <input
+                  required
                   key={index}
                   type="text"
                   maxLength={1}
@@ -135,10 +142,9 @@ const OTPVerificationPage: React.FC = () => {
               </p>
             )}
 
-            
-              <Button type="submit" className="w-full" disabled={isLoading}>{isLoading ? "Verifying..." : "Verify OTP"} </Button>
-              
-           
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Verifying..." : "Verify OTP"}{" "}
+            </Button>
           </form>
         </div>
       </div>
