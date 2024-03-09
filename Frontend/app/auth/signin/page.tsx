@@ -2,7 +2,13 @@
 
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useSigninMutation } from "@/store/auth/page";
@@ -17,34 +23,18 @@ import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
-
+const formSchema = z.object({
+  email: z
+    .string({ required_error: "Email is required" })
+    .email({ message: "Please enter a valid email format" }),
+  password: z
+    .string({ required_error: "Password is required" })
+    .min(8, { message: "Password must contain at least 8 characters" }),
+});
 const LoginPage: React.FC = () => {
-  const [credentials, setCredentials] = useState({
-    email: "",
-    password: "",
-  });
-  const query = querystring.stringify({
-    email: credentials.email,
-    source: "signin",
-  });
   const router = useRouter();
   const { toast } = useToast();
   const [signin, { isLoading, isError, data, isSuccess }] = useSigninMutation();
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setCredentials((prevCredentials) => ({
-      ...prevCredentials,
-      [name]: value,
-    }));
-  };
-  const formSchema = z.object({
-    email: z
-      .string({ required_error: "Email is required" })
-      .email({ message: "Please enter a valid email format" }),
-    password: z
-      .string({ required_error: "Password is required" })
-      .min(8, { message: "Password must contain at least 8 characters" }),
-  });
 
   type FormType = z.infer<typeof formSchema>;
   const form = useForm<FormType>({
@@ -53,11 +43,15 @@ const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<{ email: string; password: string }> = async (
     data
   ) => {
+    const query = querystring.stringify({
+      email: data.email,
+      source: "signin",
+    });
     try {
       const response = await signin(data);
       if (isSuccess) {
         toast({
-          description: "Sign successful!.",
+          description: "Signin successful!.",
         });
         router.push("/TravelHistory/userpage");
       } else if (isError) {
@@ -114,7 +108,6 @@ const LoginPage: React.FC = () => {
                   <FormItem>
                     <FormControl>
                       <PasswordInput
-                     
                         className="font-semibold text-primary"
                         placeholder="Password"
                         {...field}
@@ -127,11 +120,10 @@ const LoginPage: React.FC = () => {
 
               <div className="text-right">
                 {" "}
-                {/* Add text-right class here */}
                 <Link
                   href={{
                     pathname: "/auth/forgot-password-email",
-                    query: query,
+                    query: { source: "signin" },
                   }}
                   className="text-xs text-indigo-600 hover:text-indigo-500"
                 >

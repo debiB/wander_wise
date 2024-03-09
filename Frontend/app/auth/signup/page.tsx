@@ -1,46 +1,85 @@
 "use client";
 
 import google from "@/asset/Google-Logo.png";
-import {Button} from "@/components/ui/button";
+import { PasswordInput } from "@/components/passwordInput";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { useSignupMutation } from "@/store/auth/page";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import querystring from 'querystring';
+import querystring from "querystring";
 import { useState, FormEvent, ChangeEvent } from "react";
+import { useForm } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form";
+import { z } from "zod";
 
+const formSchema = z
+  .object({
+    name: z.string({ required_error: "Name is required" }),
+    email: z
+      .string({ required_error: "Email is required" })
+      .email({ message: "Please enter a valid email format" }),
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password must contain at least 8 characters" }),
+    confirmPassword: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password must contain at least 8 characters" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
+type FormType = z.infer<typeof formSchema>;
 
 const Page: React.FC = () => {
-  const router = useRouter();
-  const [credentials, setCredentials] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  const form = useForm<FormType>({
+    resolver: zodResolver(formSchema),
   });
-const query = querystring.stringify({ email: credentials.email, source: "signup"});
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setCredentials((prevCredentials) => ({
-      ...prevCredentials,
-      [name]: value,
-    }));
-  };
+
+  const router = useRouter();
+
+  const { toast } = useToast();
 
   const [signup, { isLoading, isError, isSuccess, data }] = useSignupMutation();
 
-  const handleSubmit = async (e: FormEvent): Promise<void> => {
-    e.preventDefault();
-
+  const onSubmit: SubmitHandler<{
+    name: string;
+    email: string;
+    password: string;
+  }> = async (data) => {
+    const query = querystring.stringify({
+      email: data.email,
+      source: "signup",
+    });
     try {
-      const response = await signup(credentials);
+      const response = await signup(data);
       if (isSuccess) {
+        toast({
+          description: "Sign up successful!.",
+        });
         router.push(`/auth/otp-verification?${query}`);
       } else {
-        console.error("Signup failed:");
+        toast({
+          variant: "destructive",
+          description: "Sign in failed.",
+        });
       }
     } catch (error) {
-      console.error("Signup error:", error);
+      toast({
+        variant: "destructive",
+        description: "Sign in failed.",
+      });
     }
   };
 
@@ -54,98 +93,79 @@ const query = querystring.stringify({ email: credentials.email, source: "signup"
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="text"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Full Name
-              </label>
-              <div className="mt-1">
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  value={credentials.name}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email address
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={credentials.email}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
+          <Form {...form}>
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        className="font-semibold text-primary"
+                        placeholder="Full Name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        className="font-semibold text-primary"
+                        placeholder="Email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <PasswordInput
+                        className="font-semibold text-primary"
+                        placeholder="Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={credentials.password}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <PasswordInput
+                        className="font-semibold text-primary"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  value={credentials.confirmPassword}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-5"
-                />
-              </div>
-            </div>
-
-            <Button
-              className="w-full"
-              type="submit" onClick={handleSubmit}
-            >
-              Sign up
-            </Button>
-
-           
-          </form>
+              <Button className="w-full" type="submit">
+                Sign up
+              </Button>
+            </form>
+          </Form>
           <div className="mt-6">
             <div className="relative mb-10">
               <div className="absolute inset-0 flex items-center">
@@ -157,8 +177,9 @@ const query = querystring.stringify({ email: credentials.email, source: "signup"
                 </span>
               </div>
             </div>
-            <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"><Link href="/auth/signin">Sign in</Link></Button>
-
+            <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <Link href="/auth/signin">Sign in</Link>
+            </Button>
           </div>
         </div>
       </div>
