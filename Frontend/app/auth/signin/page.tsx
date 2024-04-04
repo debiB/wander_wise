@@ -2,13 +2,7 @@
 
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useSigninMutation } from "@/store/auth/page";
@@ -22,6 +16,7 @@ import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
+
 
 const formSchema = z.object({
   email: z
@@ -43,12 +38,13 @@ const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<{ email: string; password: string }> = async (
     data
   ) => {
+    
     const query = querystring.stringify({
       email: data.email,
       source: "signin",
     });
     try {
-      // const response = await signin(data);
+      const response = await signin(data);
       if (isSuccess) {
         toast({
           description: "Signin successful!.",
@@ -67,6 +63,7 @@ const LoginPage: React.FC = () => {
       });
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">

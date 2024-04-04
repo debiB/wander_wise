@@ -32,6 +32,7 @@ async function signup(req, res) {
   }
 }
 
+
 async function sendOtpEmail(email, otp) {
   const mailOptions = {
     from: process.env.EMAIL_ADDRESS,
@@ -133,4 +134,37 @@ async function login(req, res) {
   }
 }
 
-module.exports = { signup, verifyOtp, login, resendOtp};
+
+async function modifyPassword(req, res) {
+  const { email, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    // Check if newPassword is provided
+    if (!newPassword) {
+      return res.status(400).json({ error: 'New password is required' });
+    }
+
+    // Optionally, you can include additional authentication here, such as checking the validity of a JWT token.
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+
+
+
+module.exports = { signup, verifyOtp, login, resendOtp, modifyPassword };
+// modifyPassword
