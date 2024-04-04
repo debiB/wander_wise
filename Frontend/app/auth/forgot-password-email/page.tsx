@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { useResendOtpMutation } from "@/store/auth/page";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,8 +10,8 @@ import React from "react";
 import { useState, ChangeEvent, FormEvent } from "react";
 
 
-
 const page = () => {
+  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const router = useRouter();
   const [resendOtp, { isLoading, isError, isSuccess, data }] =
@@ -24,13 +25,24 @@ const page = () => {
     try{
         const response = await resendOtp({email: email});
         if(isSuccess){
+           toast({
+             description: "Email sent.",
+           });
             router.push(`/auth/otp-verification?${query}`);
-        }else{
-            console.error("Forgot password failed:");
+        }else if(isError){
+           toast({
+             variant: "destructive",
+             description: "No user found with this email.",
+           });
+            
         }
     }
     catch(error){
-        console.error("Forgot password error:", error);
+       toast({
+         variant: "destructive",
+         description: "Forgot password error.",
+       });
+  
     }
   };
   return (
@@ -54,6 +66,7 @@ const page = () => {
                 </label>
                 <div className="mt-1">
                   <input
+                  
                     id="email"
                     name="email"
                     type="email"
@@ -67,7 +80,7 @@ const page = () => {
               </div>
 
               <Button className="w-full" type= "submit">
-                Send otp
+                {isLoading? "Sending otp..." : "Send otp"}
               </Button>
             </form>
           </div>

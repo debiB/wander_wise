@@ -48,7 +48,7 @@ const LoginPage: React.FC = () => {
       source: "signin",
     });
     try {
-      const response = await signin(data);
+      // const response = await signin(data);
       if (isSuccess) {
         toast({
           description: "Signin successful!.",
@@ -131,7 +131,7 @@ const LoginPage: React.FC = () => {
                 </Link>
               </div>
               <Button className="w-full" type="submit">
-                Login
+                 {isLoading? "Signing in ....": "Sign in"} 
               </Button>
             </form>
           </Form>
@@ -147,7 +147,9 @@ const LoginPage: React.FC = () => {
               </div>
             </div>
             <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <Link href="/auth/signup">Sign up</Link>
+              <Link href="/auth/signup">
+              Sign up
+                </Link>
             </Button>
           </div>
         </div>

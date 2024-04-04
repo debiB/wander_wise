@@ -1,23 +1,67 @@
 "use client";
 
+import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
+import { useModifyPasswordMutation } from "@/store/auth/page";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import querystring from "querystring";
 import React from "react";
 import { useState, ChangeEvent } from "react";
+import { FormEvent } from "react";
+import { useForm } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form";
+import { z } from "zod";
+
+
+const formSchema = z.object({
+  password: z.string({ required_error: "Password is required" }).min(8, { message: "Password must contain at least 8 characters" }),
+  confirmPassword: z.string({ required_error: "Password is required" }).min(8, { message: "Password must contain at least 8 characters" }),
+}).refine((data) => data.password === data.confirmPassword, {
+  path: ["confirmPassword"],
+  message: "Passwords do not match"
+});
 
 const page = () => {
-  const [credentials, setCredentials] = useState({
-    password: "",
-    confirmPassword: "",
-  });
-  const handleSubmit = () => {};
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setCredentials((prevCredentials) => ({
-      ...prevCredentials,
-      [name]: value,
-    }));
+   const searchParams = useSearchParams();
+  const email = searchParams.get("email") ?? "";
+  const { toast } = useToast();
+  const router = useRouter();
+  const [modifyPassword, { isLoading, isError, isSuccess, data }] =
+    useModifyPasswordMutation();
+  const onSubmit: SubmitHandler<{ password: string }> = async (
+    data
+  ) => {
+    data.password??= ""
+    const response_object = { email: email, password: data.password};
+    try {
+      const response = await modifyPassword(response_object);
+      if (isSuccess) {
+        toast({
+          description: "Password changed successfully.",
+        });
+        router.push(`/auth/signin`);
+      } else if (isError) {
+        toast({
+          variant: "destructive",
+          description: "Password change failed.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        description: "Password change error.",
+      });
+    }
   };
+ 
+  type FormType = z.infer<typeof formSchema>;
+  const form = useForm<FormType>({
+    resolver: zodResolver(formSchema),
+  });
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -28,53 +72,48 @@ const page = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="password"
-                  required
-                  // value={email}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
+          <Form {...form}>
+          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <PasswordInput
+                        className="font-semibold text-primary"
+                        placeholder="Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Confirm Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="comfirm_password"
-                  name="confirm_password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  // value={password}
-                  onChange={handleInputChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                />
-              </div>
-            </div>
-
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <PasswordInput
+                        className="font-semibold text-primary"
+                        placeholder="Confirm Password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             <Button className="w-full" type="submit">
-                <Link href="/auth/signin">Reset Password</Link>
+              <Link href="/auth/signin">
+                {isLoading ? "Changing Password..." : "Reset Password"}
+              </Link>
             </Button>
           </form>
+          </Form>
         </div>
       </div>
     </div>

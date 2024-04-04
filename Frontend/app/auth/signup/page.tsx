@@ -69,7 +69,7 @@ const Page: React.FC = () => {
           description: "Sign up successful!.",
         });
         router.push(`/auth/otp-verification?${query}`);
-      } else {
+      } else if (isError){
         toast({
           variant: "destructive",
           description: "Sign in failed.",
@@ -178,7 +178,9 @@ const Page: React.FC = () => {
               </div>
             </div>
             <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <Link href="/auth/signin">Sign in</Link>
+              <Link href="/auth/signin">
+                {isLoading? "Signing up..." : "Sign up"}
+                </Link>
             </Button>
           </div>
         </div>

@@ -83,8 +83,8 @@ const OTPVerificationPage: React.FC = () => {
         });
         if (source === "signup") {
           router.push("/TravelHistory/userpage");
-        } else router.push("/auth/reset-password");
-      } else {
+        } else router.push(`/auth/reset-password?${email}`);
+      } else if (isError){
         toast({
           variant: "destructive",
           description: "OTP verification failed",
