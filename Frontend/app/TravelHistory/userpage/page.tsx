@@ -3,7 +3,7 @@
 import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
-
+import Link from "next/link";
 const Page = () => {
   const [allowCustomDescription, setAllowCustomDescription] = useState(false);
   const [allowGenerateButton, setAllowGenerateButton] = useState(true);
@@ -20,7 +20,10 @@ const Page = () => {
         <div className="py-4">
           <div className="mx-auto px-4">
             <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex justify-between">
               <h1 className="text-xl font-bold mb-4">Your History</h1>
+              <Button className="text-blue-500 bg-white hover:bg-white hover:underline"><Link href="/TravelHistory/see-all-destinations" >See all</Link></Button>
+              </div>
               <div className="md:flex block align-items-center">
                 <div className="md:w-1/2 w-full mr-2 bg-gray-100 p-4 rounded-lg mb-4">
                   <div>
