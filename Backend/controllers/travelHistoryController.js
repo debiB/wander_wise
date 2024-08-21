@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 const TravelHistory = require('../models/travelHistoryModel'); 
 const { ObjectId } = mongoose.Types;
 const { Types } = require('mongoose');
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 
 async function getAllDestinationsByUserId(req, res) {
     const userId = req.body.userId;
@@ -104,6 +103,8 @@ async function getDestinationByUserIdAndDestinationName(req, res) {
 
 
 async function generateTravelRecommendation(req, res) {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const userId = req.body.userId;
     const customDescription = req.body.customDescription || ''; 
 
@@ -112,8 +113,8 @@ async function generateTravelRecommendation(req, res) {
         const travelHistory = await TravelHistory.findOne({ userId: userIdObj }); 
 
         if (!travelHistory) {
-             console.log('Request body:', req.body);
-console.log('Converted ObjectId:', userIdObj);
+            console.log('Request body:', req.body);
+            console.log('Converted ObjectId:', userIdObj);
             return res.status(404).json({ message: 'User travel history not found' });
         }
 
@@ -122,23 +123,22 @@ console.log('Converted ObjectId:', userIdObj);
         let prompt;
 
         if (customDescription) {
-            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, with the following additional considerations: ${customDescription}, please recommend a new travel destination.`;
+            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, with the following additional considerations: ${customDescription}, recommend one new travel destination. Do not add any extra text. Only give me the name of the place.`;
         } else {
-            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, please recommend a new travel destination.`;
+            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, recommend one new travel destination. Do not add any extra text. Only give me the name of the place.`;
         }
-       
 
+        const response = await model.generateContent(prompt);
+        const result = await response.response 
+        const text = result.text();
 
-       
-        const response = await model.generateText({ prompt });
-        const recommendation = response.data.choices[0].text.trim();
-
-        res.json({ recommendation });
+        res.json({reccomendation: text});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
 async function addTravelHistory(req, res) {
     const userId = req.body.userId;
     const newDestinations = req.body.destinations; // Expected format: [{ _id, name, rating }]
