@@ -3,13 +3,7 @@
 import google from "@/asset/Google-Logo.png";
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useSignupMutation } from "@/store/auth/page";
@@ -18,10 +12,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import querystring from "querystring";
-import { useState, FormEvent, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
+
 
 const formSchema = z
   .object({
@@ -59,30 +53,37 @@ const Page: React.FC = () => {
     password: string;
   }> = async (data) => {
     const query = querystring.stringify({
+      name: data.name,
       email: data.email,
       source: "signup",
     });
-    try {
-      const response = await signup(data);
-      if (isSuccess) {
+
+    const dataToBeSent = {
+      name: data.name,
+      email: data.email,
+      password: data.password,
+    };
+
+    signup(dataToBeSent)
+      .unwrap()
+      .then((response) => {
+        
         toast({
-          description: "Sign up successful!.",
+          description: "Sign up successful!",
+          
         });
         router.push(`/auth/otp-verification?${query}`);
-      } else if (isError){
+      })
+      .catch((error) => {
+        
         toast({
           variant: "destructive",
-          description: "Sign in failed.",
+          description: "Sign up failed.",
         });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        description: "Sign in failed.",
       });
-    }
   };
 
+  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -161,8 +162,8 @@ const Page: React.FC = () => {
                 )}
               />
 
-              <Button className="w-full" type="submit">
-                Sign up
+              <Button className="w-full" type="submit" disabled={isLoading}>
+                {isLoading ? "Signing up..." : "Sign up"}
               </Button>
             </form>
           </Form>
@@ -178,9 +179,7 @@ const Page: React.FC = () => {
               </div>
             </div>
             <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <Link href="/auth/signin">
-                {isLoading? "Signing up..." : "Sign up"}
-                </Link>
+              <Link href="/auth/signin">Sign in</Link>
             </Button>
           </div>
         </div>

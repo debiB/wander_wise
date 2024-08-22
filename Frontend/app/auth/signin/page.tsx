@@ -43,26 +43,23 @@ const LoginPage: React.FC = () => {
       email: data.email,
       source: "signin",
     });
-    try {
-      const response = await signin(data);
-      if (isSuccess) {
-        toast({
-          description: "Signin successful!.",
-        });
-        router.push("/TravelHistory/userpage");
-      } else if (isError) {
-        toast({
-          variant: "destructive",
-          description: "Sign in failed. Invalid credentials.",
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        description: "Sign in failed.",
-      });
-    }
-  };
+signin(data)
+  .unwrap()
+  .then((data: userLoginReturnObjectType) => {
+    toast({
+      description: "Signin successful!",
+    });
+    router.push("/TravelHistory/userpage");
+  })
+  .catch((error) => {
+    toast({
+      variant: "destructive",
+      description: "Sign in failed.",
+    });
+  });
+};
+
+
   
 
   return (

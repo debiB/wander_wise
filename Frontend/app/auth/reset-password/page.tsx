@@ -37,25 +37,21 @@ const page = () => {
   ) => {
     data.password??= ""
     const response_object = { email: email, password: data.password};
-    try {
-      const response = await modifyPassword(response_object);
-      if (isSuccess) {
-        toast({
-          description: "Password changed successfully.",
-        });
-        router.push(`/auth/signin`);
-      } else if (isError) {
-        toast({
-          variant: "destructive",
-          description: "Password change failed.",
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        description: "Password change error.",
-      });
-    }
+   modifyPassword(response_object)
+     .unwrap()
+     .then(() => {
+       toast({
+         description: "Password changed successfully.",
+       });
+       router.push(`/auth/signin`);
+     })
+     .catch((error) => {
+       toast({
+         variant: "destructive",
+         description: "Password change failed.",
+       });
+     });
+
   };
  
   type FormType = z.infer<typeof formSchema>;

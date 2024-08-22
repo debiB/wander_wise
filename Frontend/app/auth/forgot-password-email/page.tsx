@@ -22,28 +22,27 @@ const page = () => {
   };
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-    try{
-        const response = await resendOtp({email: email});
-        if(isSuccess){
-           toast({
-             description: "Email sent.",
-           });
-            router.push(`/auth/otp-verification?${query}`);
-        }else if(isError){
-           toast({
-             variant: "destructive",
-             description: "No user found with this email.",
-           });
-            
+    resendOtp({ email: email })
+      .unwrap()
+      .then(() => {
+        toast({
+          description: "Email sent.",
+        });
+        router.push(`/auth/otp-verification?${query}`);
+      })
+      .catch((error) => {
+        if (isError) {
+          toast({
+            variant: "destructive",
+            description: "No user found with this email.",
+          });
+        } else {
+          toast({
+            variant: "destructive",
+            description: "Forgot password error.",
+          });
         }
-    }
-    catch(error){
-       toast({
-         variant: "destructive",
-         description: "Forgot password error.",
-       });
-  
-    }
+      });
   };
   return (
     <div>

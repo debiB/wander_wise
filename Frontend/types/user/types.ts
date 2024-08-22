@@ -2,6 +2,11 @@ export interface userLogin {
   email: string;
   password: string;
 }
+export interface userSignUp{
+  email: string;
+  password: string;
+  name: string;
+}
 export interface userLoginReturnObjectType {
   token: string;  
 }

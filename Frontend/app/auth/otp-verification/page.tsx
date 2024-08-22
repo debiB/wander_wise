@@ -73,29 +73,26 @@ const OTPVerificationPage: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-
-    try {
-      const enteredOTP = otp.join("");
-      const response = await verifyOTP({ email: emailString, otp: enteredOTP });
-      if (isSuccess) {
-        toast({
-          description: "Email verification successful!.",
-        });
-        if (source === "signup") {
-          router.push("/TravelHistory/userpage");
-        } else router.push(`/auth/reset-password?${email}`);
-      } else if (isError){
-        toast({
-          variant: "destructive",
-          description: "OTP verification failed",
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        description: "OTP verification error",
-      });
+   const enteredOTP = otp.join("");
+verifyOTP({ email: emailString, otp: enteredOTP })
+  .unwrap()
+  .then(() => {
+    toast({
+      description: "Email verification successful!",
+    });
+    if (source === "signup") {
+      router.push("/TravelHistory/userpage");
+    } else {
+      router.push(`/auth/reset-password?${email}`);
     }
+  })
+  .catch((error) => {
+    toast({
+      variant: "destructive",
+      description: "OTP verification failed",
+    });
+  });
+
   };
 
   return (
