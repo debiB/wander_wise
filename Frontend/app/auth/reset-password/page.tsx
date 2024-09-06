@@ -2,9 +2,15 @@
 
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { useModifyPasswordMutation } from "@/store/auth/page";
+import { useModifyPasswordMutation } from "@/store/auth/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,44 +22,46 @@ import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 
-
-const formSchema = z.object({
-  password: z.string({ required_error: "Password is required" }).min(8, { message: "Password must contain at least 8 characters" }),
-  confirmPassword: z.string({ required_error: "Password is required" }).min(8, { message: "Password must contain at least 8 characters" }),
-}).refine((data) => data.password === data.confirmPassword, {
-  path: ["confirmPassword"],
-  message: "Passwords do not match"
-});
+const formSchema = z
+  .object({
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password must contain at least 8 characters" }),
+    confirmPassword: z
+      .string({ required_error: "Password is required" })
+      .min(8, { message: "Password must contain at least 8 characters" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
 
 const page = () => {
-   const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
   const { toast } = useToast();
   const router = useRouter();
   const [modifyPassword, { isLoading, isError, isSuccess, data }] =
     useModifyPasswordMutation();
-  const onSubmit: SubmitHandler<{ password: string }> = async (
-    data
-  ) => {
-    data.password??= ""
-    const response_object = { email: email, password: data.password};
-   modifyPassword(response_object)
-     .unwrap()
-     .then(() => {
-       toast({
-         description: "Password changed successfully.",
-       });
-       router.push(`/auth/signin`);
-     })
-     .catch((error) => {
-       toast({
-         variant: "destructive",
-         description: "Password change failed.",
-       });
-     });
-
+  const onSubmit: SubmitHandler<{ password: string }> = async (data) => {
+    data.password ??= "";
+    const response_object = { email: email, password: data.password };
+    modifyPassword(response_object)
+      .unwrap()
+      .then(() => {
+        toast({
+          description: "Password changed successfully.",
+        });
+        router.push(`/auth/signin`);
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          description: "Password change failed.",
+        });
+      });
   };
- 
+
   type FormType = z.infer<typeof formSchema>;
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -69,8 +77,8 @@ const page = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <Form {...form}>
-          <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
@@ -103,12 +111,12 @@ const page = () => {
                   </FormItem>
                 )}
               />
-            <Button className="w-full" type="submit">
-              <Link href="/auth/signin">
-                {isLoading ? "Changing Password..." : "Reset Password"}
-              </Link>
-            </Button>
-          </form>
+              <Button className="w-full" type="submit">
+                <Link href="/auth/signin">
+                  {isLoading ? "Changing Password..." : "Reset Password"}
+                </Link>
+              </Button>
+            </form>
           </Form>
         </div>
       </div>

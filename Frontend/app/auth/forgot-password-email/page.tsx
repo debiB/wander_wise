@@ -2,13 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { useResendOtpMutation } from "@/store/auth/page";
+import { useResendOtpMutation } from "@/store/auth/authApi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import querystring from 'querystring';
+import querystring from "querystring";
 import React from "react";
 import { useState, ChangeEvent, FormEvent } from "react";
-
 
 const page = () => {
   const { toast } = useToast();
@@ -16,7 +15,7 @@ const page = () => {
   const router = useRouter();
   const [resendOtp, { isLoading, isError, isSuccess, data }] =
     useResendOtpMutation();
-    const query = querystring.stringify({ email: email });
+  const query = querystring.stringify({ email: email });
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setEmail(e.target.value);
   };
@@ -65,7 +64,6 @@ const page = () => {
                 </label>
                 <div className="mt-1">
                   <input
-                  
                     id="email"
                     name="email"
                     type="email"
@@ -78,8 +76,8 @@ const page = () => {
                 </div>
               </div>
 
-              <Button className="w-full" type= "submit">
-                {isLoading? "Sending otp..." : "Send otp"}
+              <Button className="w-full" type="submit">
+                {isLoading ? "Sending otp..." : "Send otp"}
               </Button>
             </form>
           </div>

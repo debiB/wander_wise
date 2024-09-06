@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import {
   useOtpVerificationMutation,
   useResendOtpMutation,
-} from "@/store/auth/page";
+} from "@/store/auth/authApi";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
@@ -73,26 +73,25 @@ const OTPVerificationPage: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-   const enteredOTP = otp.join("");
-verifyOTP({ email: emailString, otp: enteredOTP })
-  .unwrap()
-  .then(() => {
-    toast({
-      description: "Email verification successful!",
-    });
-    if (source === "signup") {
-      router.push("/TravelHistory/userpage");
-    } else {
-      router.push(`/auth/reset-password?${email}`);
-    }
-  })
-  .catch((error) => {
-    toast({
-      variant: "destructive",
-      description: "OTP verification failed",
-    });
-  });
-
+    const enteredOTP = otp.join("");
+    verifyOTP({ email: emailString, otp: enteredOTP })
+      .unwrap()
+      .then(() => {
+        toast({
+          description: "Email verification successful!",
+        });
+        if (source === "signup") {
+          router.push("/TravelHistory/userpage");
+        } else {
+          router.push(`/auth/reset-password?${email}`);
+        }
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          description: "OTP verification failed",
+        });
+      });
   };
 
   return (

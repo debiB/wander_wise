@@ -3,10 +3,16 @@
 import google from "@/asset/Google-Logo.png";
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useSignupMutation } from "@/store/auth/page";
+import { useSignupMutation } from "@/store/auth/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,7 +21,6 @@ import querystring from "querystring";
 import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
-
 
 const formSchema = z
   .object({
@@ -67,15 +72,12 @@ const Page: React.FC = () => {
     signup(dataToBeSent)
       .unwrap()
       .then((response) => {
-        
         toast({
           description: "Sign up successful!",
-          
         });
         router.push(`/auth/otp-verification?${query}`);
       })
       .catch((error) => {
-        
         toast({
           variant: "destructive",
           description: "Sign up failed.",
@@ -83,7 +85,6 @@ const Page: React.FC = () => {
       });
   };
 
-  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">

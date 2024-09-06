@@ -2,10 +2,16 @@
 
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useSigninMutation } from "@/store/auth/page";
+import { useSigninMutation } from "@/store/auth/authApi";
 import { userLoginReturnObjectType } from "@/types/user/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -16,7 +22,6 @@ import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
-
 
 const formSchema = z.object({
   email: z
@@ -38,29 +43,25 @@ const LoginPage: React.FC = () => {
   const onSubmit: SubmitHandler<{ email: string; password: string }> = async (
     data
   ) => {
-    
     const query = querystring.stringify({
       email: data.email,
       source: "signin",
     });
-signin(data)
-  .unwrap()
-  .then((data: userLoginReturnObjectType) => {
-    toast({
-      description: "Signin successful!",
-    });
-    router.push("/TravelHistory/userpage");
-  })
-  .catch((error) => {
-    toast({
-      variant: "destructive",
-      description: "Sign in failed.",
-    });
-  });
-};
-
-
-  
+    signin(data)
+      .unwrap()
+      .then((data: userLoginReturnObjectType) => {
+        toast({
+          description: "Signin successful!",
+        });
+        router.push("/TravelHistory/userpage");
+      })
+      .catch((error) => {
+        toast({
+          variant: "destructive",
+          description: "Sign in failed.",
+        });
+      });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -125,7 +126,7 @@ signin(data)
                 </Link>
               </div>
               <Button className="w-full" type="submit">
-                 {isLoading? "Signing in ....": "Sign in"} 
+                {isLoading ? "Signing in ...." : "Sign in"}
               </Button>
             </form>
           </Form>
@@ -141,9 +142,7 @@ signin(data)
               </div>
             </div>
             <Button className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <Link href="/auth/signup">
-              Sign up
-                </Link>
+              <Link href="/auth/signup">Sign up</Link>
             </Button>
           </div>
         </div>

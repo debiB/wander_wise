@@ -44,7 +44,7 @@ const Page: React.FC = () => {
       setError("All fields are required.");
     } else {
       setError(null);
-      // Proceed with form submission logic
+     
       console.log("Form submitted with data:", places);
     }
   };
