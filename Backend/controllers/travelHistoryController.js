@@ -59,25 +59,33 @@ async function getDestinationByUserIdAndDestinationId(req, res) {
 }
 
 async function getDestinationByUserIdAndDestinationName(req, res) {
-    const userId = req.user.id; 
+    const userId = req.user.id;
     const destinationName = req.query.destinationName;
 
     try {
+      
         const userIdObj = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : null;
 
         if (!userIdObj) {
             return res.status(400).json({ message: 'Invalid user ID format' });
         }
 
+       
         const travelHistory = await TravelHistory.findOne({ userId: userIdObj });
 
         if (!travelHistory) {
+            console.log('Travel history not found for user:', userId);
             return res.status(404).json({ message: 'User travel history not found' });
         }
 
-        const destination = travelHistory.destinations.find(dest => dest.name === destinationName);
+        
+        const trimmedDestinationName = destinationName.trim().toLowerCase();
 
+        
+        const destination = travelHistory.destinations.find(dest => dest.name.toLowerCase() === trimmedDestinationName);
+        
         if (!destination) {
+            console.log('Destination not found:', destinationName);
             return res.status(404).json({ message: 'Destination not found for the user' });
         }
 
@@ -87,6 +95,8 @@ async function getDestinationByUserIdAndDestinationName(req, res) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+
+
 
 async function generateTravelRecommendation(req, res) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
