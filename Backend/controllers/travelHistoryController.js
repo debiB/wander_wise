@@ -51,7 +51,7 @@ async function getDestinationByUserIdAndDestinationId(req, res) {
             return res.status(404).json({ message: 'Destination not found for the user' });
         }
 
-        res.json(destination);
+        res.json({destinations: destination});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });

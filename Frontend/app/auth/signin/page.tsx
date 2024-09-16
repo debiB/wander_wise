@@ -2,13 +2,7 @@
 
 import { PasswordInput } from "@/components/passwordInput";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useSigninMutation } from "@/store/auth/authApi";
@@ -22,6 +16,7 @@ import React, { useState, FormEvent, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { SubmitHandler } from "react-hook-form";
 import { z } from "zod";
+
 
 const formSchema = z.object({
   email: z
@@ -50,9 +45,11 @@ const LoginPage: React.FC = () => {
     signin(data)
       .unwrap()
       .then((data: userLoginReturnObjectType) => {
-        toast({
-          description: "Signin successful!",
-        });
+         localStorage.setItem("token", data.token);
+         console.log(localStorage.getItem("token"))
+         toast({
+           description: "Signin successful!",
+         });
         router.push("/TravelHistory/userpage");
       })
       .catch((error) => {

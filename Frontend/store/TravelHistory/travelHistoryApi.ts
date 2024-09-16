@@ -1,18 +1,58 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-
-export const userAPI = createApi({
-  reducerPath: "travelHistoryAPI",
+import{GetDestinationByUserIdAndDestinationIdResponse, GetDestinationByUserIdAndDestinationNameResponse,GenerateTravelRecommendationResponse,  GenerateTravelRecommendationRequest, AddTravelHistoryResponse,AddTravelHistoryRequest,Destination }  from "@/types/travelHistory/types"
+export const travelAPI = createApi({
+  reducerPath: 'travelAPI',
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3000",
+    baseUrl: 'http://localhost:3000/user', 
+    prepareHeaders: (headers) => {
+     const token = localStorage.getItem('token');
+  if (token) {
+    headers.set('authorization', `Bearer ${token}`);
+  }
+  
+  return headers;
+}
   }),
   endpoints: (builder) => ({
-
+    getAllTravelHistory: builder.query<Destination[], any>({
+      query: () => ({
+        url: `/getAllTravelHistory`,
+        method: 'GET',
+      }),
+    }),
+    
+    getAllTravelHistoryById: builder.query<GetDestinationByUserIdAndDestinationIdResponse, any>({
+      query: (destinationId) => ({
+        url: `/getAllTravelHistoryById`,
+        method: 'GET',
+        params: {destinationId}
+      }),
+    }),
+    
+     getAllTravelHistoryName: builder.query<GetDestinationByUserIdAndDestinationNameResponse, any>({
+      query: (destinationName) => ({
+        url: `/getAllTravelHistoryName`,
+        method: 'GET',
+        params: {destinationName}
+      }),
+    }),
+    generateRecommendation: builder.mutation<GenerateTravelRecommendationResponse, GenerateTravelRecommendationRequest>({
+      query: (body) => ({
+        url: '/generate-recommendation',
+        method: 'POST',
+        body,
+      }),
+    }),
+     addTravelHistory: builder.mutation<AddTravelHistoryResponse, AddTravelHistoryRequest>({
+      query: (body) => ({
+        url: '/addTravelHistory',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
-export const {
-
-  
-} = userAPI;
+export const {useAddTravelHistoryMutation, useGenerateRecommendationMutation, useGetAllTravelHistoryByIdQuery, useGetAllTravelHistoryNameQuery, useGetAllTravelHistoryQuery} = travelAPI;
