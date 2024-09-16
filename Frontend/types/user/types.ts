@@ -8,6 +8,7 @@ export interface userSignUp{
   name: string;
 }
 export interface userLoginReturnObjectType {
+  name: string
   token: string;  
 }
 export interface OtpVerificationPayload {

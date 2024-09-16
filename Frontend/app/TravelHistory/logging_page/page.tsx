@@ -1,6 +1,7 @@
 "use client";
 
 import NavBar from "@/components/NavBar";
+import SignedinNavBar from "@/components/SignedinNavBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -55,8 +56,14 @@ const Page: React.FC = () => {
     const emptyFields = places.some(
       (place) => place.country === "" || place.rating === ""
     );
+    const invalidRating = places.some(
+      (place) => Number(place.rating) < 0 || Number(place.rating) > 5
+    );
+
     if (emptyFields) {
       setError("All fields are required.");
+    } else if (invalidRating) {
+      setError("Rating must be a number between 0 and 5.");
     } else {
       setError(null);
 
@@ -68,7 +75,7 @@ const Page: React.FC = () => {
 
       try {
         // Call the mutation to submit the data
-        const response = await addTravelHistory({ destination }).unwrap();
+        await addTravelHistory({ destination }).unwrap();
         toast({
           description: "Travel History added successfully!",
         });
@@ -85,7 +92,7 @@ const Page: React.FC = () => {
 
   return (
     <div>
-      <NavBar />
+      <SignedinNavBar />
       <div className="md:w-3/4 w-full mx-auto bg-gray-100 p-4  my-10 rounded-lg mb-4">
         {!isClicked && (
           <div className="flex justify-center">
@@ -114,8 +121,11 @@ const Page: React.FC = () => {
                 />
                 <Input
                   className="w-1/2"
+                  type="number"
+                  min={0}
+                  max={5}
                   name="rating"
-                  placeholder="Rating"
+                  placeholder="Rating (0-5)"
                   value={place.rating}
                   onChange={(event) =>
                     handleInputChange(index, event, "rating")
@@ -125,7 +135,7 @@ const Page: React.FC = () => {
                   className="bg-red-500 text-white"
                   onClick={() => handleRemovePlace(index)}
                 >
-                  -
+                 -
                 </Button>
               </div>
             </div>
@@ -142,7 +152,7 @@ const Page: React.FC = () => {
         <div className="flex justify-center w-full">
           <form onSubmit={handleSubmit}>
             {error && <div className="text-red-500">{error}</div>}
-            <Button className=" my-20" type="submit" disabled={isLoading}>
+            <Button className="my-20" type="submit" disabled={isLoading}>
               {isLoading ? "Submitting..." : "Submit"}
             </Button>
           </form>

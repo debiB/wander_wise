@@ -9,6 +9,7 @@ import { Star, Plus } from "lucide-react";
 import { Search } from "lucide-react";
 import React, { useState } from "react";
 import Link from "next/link";
+import SignedinNavBar from "@/components/SignedinNavBar";
 
 // Define component
 const Page: React.FC = () => {
@@ -23,6 +24,7 @@ console.log(destinationData);
 
   return (
     <div>
+      <SignedinNavBar/>
       <div className="flex justify-center my-20">
         <div className="flex md:w-1/2 w-full mx-4 md:mx-0 items-center space-x-2">
           <Input placeholder="Search..." />
@@ -54,10 +56,15 @@ console.log(destinationData);
           </div>
         ))
       )}
-      <div className="flex w-full justify-center">
+      <div className="flex w-full justify-center space-x-5">
         <Link href="/TravelHistory/logging_page">
        <Button>
         <Plus/>
+        </Button>
+        </Link>
+         <Link href="/TravelHistory/userpage">
+       <Button>
+        Generate recommendation
         </Button>
         </Link>
       </div>

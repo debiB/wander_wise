@@ -20,16 +20,6 @@ const NavBar = () => {
         <div className="hidden md:flex items-center space-x-14">
           {" "}
           
-          <ul className="flex space-x-14">
-            <li className="cursor-pointer">
-              <a className="bg-hover-blue hover:text-blue-500">About us</a>
-            </li>{" "}
-           
-            <li className="cursor-pointer">
-              <a className="bg-hover-blue hover:text-blue-500">Contact us</a>
-            </li>{" "}
-            
-          </ul>
           <div className="flex space-x-14">
             <Link href="/auth/signin">
               <Button>Log in</Button>
@@ -54,16 +44,6 @@ const NavBar = () => {
           <button onClick={toggle} className="mb-4">
             <X size={30} />
           </button>
-          <ul className="block">
-            <li className="cursor-pointer mb-5">
-              <a className="bg-hover-blue hover:text-blue-500">About us</a>
-            </li>{" "}
-            
-            <li className="cursor-pointer mb-5">
-              <a className="bg-hover-blue hover:text-blue-500">Contact us</a>
-            </li>{" "}
-           
-          </ul>
           <div className="block">
             <div className="mb-5">
               <Link href="/auth/signin">

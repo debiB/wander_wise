@@ -46,6 +46,7 @@ const LoginPage: React.FC = () => {
       .unwrap()
       .then((data: userLoginReturnObjectType) => {
          localStorage.setItem("token", data.token);
+         localStorage.setItem("name", data.name);
          console.log(localStorage.getItem("token"))
          toast({
            description: "Signin successful!",

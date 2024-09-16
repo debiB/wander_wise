@@ -1,8 +1,10 @@
 "use client";
 
 import NavBar from "@/components/NavBar";
+import SignedinNavBar from "@/components/SignedinNavBar";
 import { Button } from "@/components/ui/button";
 import { useGetTwoTravelHistoryQuery, useGenerateRecommendationMutation } from "@/store/TravelHistory/travelHistoryApi";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
@@ -46,7 +48,7 @@ const Page = () => {
 console.log(recommendation);
   return (
     <div>
-      <NavBar />
+      <SignedinNavBar />
       <div className="h-screen flex flex-col justify-between mt-10">
         <div className="py-4">
           <div className="mx-auto px-4">
@@ -82,7 +84,14 @@ console.log(recommendation);
                   ))}
                 </div>
               ) : (
-                <p>No travel history found</p>
+                <div className= "flex justify-between items-center my-2">
+                <p className="mr-5">No travel history found. Add travel History to get recommendation.</p>
+                <Link href="/TravelHistory/logging_page">   
+                <Button>     
+                  <Plus/>
+                  </Button>
+                </Link>
+                  </div>
               )}
             </div>
           </div>
