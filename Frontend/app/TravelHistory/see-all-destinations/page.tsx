@@ -5,14 +5,14 @@ import { Input } from "@/components/ui/input";
 import { useGetAllTravelHistoryQuery } from "@/store/TravelHistory/travelHistoryApi";
 import { Destination } from "@/types/travelHistory/types";
 // Ensure these types are exported
-import { Star } from "lucide-react";
+import { Star, Plus } from "lucide-react";
 import { Search } from "lucide-react";
 import React, { useState } from "react";
-
+import Link from "next/link";
 
 // Define component
 const Page: React.FC = () => {
-  const [data, setData] = useState<Destination[]>([]); // State to store the array of destinations
+  const [data, setData] = useState<Destination[]>([]); 
   const {
     data: destinationData,
     refetch,
@@ -54,6 +54,13 @@ console.log(destinationData);
           </div>
         ))
       )}
+      <div className="flex w-full justify-center">
+        <Link href="/TravelHistory/logging_page">
+       <Button>
+        <Plus/>
+        </Button>
+        </Link>
+      </div>
     </div>
   );
 };

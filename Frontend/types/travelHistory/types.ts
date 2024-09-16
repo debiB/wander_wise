@@ -1,7 +1,7 @@
 export interface Destination {
     _id?: string; 
     name: string;
-    rating?: number;
+    rating?: string;
 }
 
 
@@ -40,7 +40,7 @@ export interface GenerateTravelRecommendationResponse {
 
 
 export interface AddTravelHistoryRequest {
-    destinations: Destination[];
+    destination : Destination[];
 }
 export interface AddTravelHistoryResponse {
     message: string;

@@ -3,7 +3,12 @@
 import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { useAddTravelHistoryMutation } from "@/store/TravelHistory/travelHistoryApi";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+
+// Import useRouter
 
 interface Place {
   country: string;
@@ -14,6 +19,10 @@ const Page: React.FC = () => {
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [places, setPlaces] = useState<Place[]>([{ country: "", rating: "" }]);
   const [error, setError] = useState<string | null>(null);
+
+  const [addTravelHistory, { isLoading }] = useAddTravelHistoryMutation(); // Hook for the mutation
+  const { toast } = useToast(); // Use toast properly
+  const router = useRouter(); // Initialize router
 
   const toggle = () => {
     setIsClicked(!isClicked);
@@ -34,9 +43,15 @@ const Page: React.FC = () => {
     setPlaces(newPlaces);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  // Function to remove a place
+  const handleRemovePlace = (index: number) => {
+    const newPlaces = places.filter((_, i) => i !== index);
+    setPlaces(newPlaces);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Check if any input field is empty
+
     const emptyFields = places.some(
       (place) => place.country === "" || place.rating === ""
     );
@@ -44,8 +59,27 @@ const Page: React.FC = () => {
       setError("All fields are required.");
     } else {
       setError(null);
-     
-      console.log("Form submitted with data:", places);
+
+      // Format the data to match your request structure
+      const destination = places.map((place) => ({
+        name: place.country,
+        rating: place.rating,
+      }));
+
+      try {
+        // Call the mutation to submit the data
+        const response = await addTravelHistory({ destination }).unwrap();
+        toast({
+          description: "Travel History added successfully!",
+        });
+        router.push("/TravelHistory/see-all-destinations"); // Navigate on success
+      } catch (error) {
+        console.error("Submission error:", error);
+        toast({
+          variant: "destructive",
+          description: "Travel History addition failed.",
+        });
+      }
     }
   };
 
@@ -87,6 +121,12 @@ const Page: React.FC = () => {
                     handleInputChange(index, event, "rating")
                   }
                 />
+                <Button
+                  className="bg-red-500 text-white"
+                  onClick={() => handleRemovePlace(index)}
+                >
+                  -
+                </Button>
               </div>
             </div>
           ))}
@@ -102,8 +142,8 @@ const Page: React.FC = () => {
         <div className="flex justify-center w-full">
           <form onSubmit={handleSubmit}>
             {error && <div className="text-red-500">{error}</div>}
-            <Button className=" my-20" type="submit">
-              Submit
+            <Button className=" my-20" type="submit" disabled={isLoading}>
+              {isLoading ? "Submitting..." : "Submit"}
             </Button>
           </form>
         </div>
