@@ -23,6 +23,12 @@ export const travelAPI = createApi({
       }),
     }),
     
+    getTwoTravelHistory: builder.query<Destination[], any>({
+      query: () => ({
+        url: `/getTwoTravelHistory`,
+        method: 'GET',
+      }),
+    }),
     getAllTravelHistoryById: builder.query<GetDestinationByUserIdAndDestinationIdResponse, any>({
       query: (destinationId) => ({
         url: `/getAllTravelHistoryById`,
@@ -55,4 +61,4 @@ export const travelAPI = createApi({
   }),
 });
 
-export const {useAddTravelHistoryMutation, useGenerateRecommendationMutation, useGetAllTravelHistoryByIdQuery, useGetAllTravelHistoryNameQuery, useGetAllTravelHistoryQuery} = travelAPI;
+export const {useAddTravelHistoryMutation, useGenerateRecommendationMutation, useGetAllTravelHistoryByIdQuery, useGetAllTravelHistoryNameQuery, useGetAllTravelHistoryQuery, useGetTwoTravelHistoryQuery} = travelAPI;

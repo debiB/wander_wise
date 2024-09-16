@@ -35,7 +35,7 @@ export interface GenerateTravelRecommendationRequest {
 
 
 export interface GenerateTravelRecommendationResponse {
-    recommendation: string;
+    reccomendation: string;
 }
 
 
