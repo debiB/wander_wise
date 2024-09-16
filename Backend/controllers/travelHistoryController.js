@@ -26,6 +26,29 @@ async function getAllDestinationsByUserId(req, res) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+async function getFirstTwoDestinationsByUserId(req, res) {
+    const userId = req.user.id;
+
+    try {
+        const userIdObj = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : null;
+
+        if (!userIdObj) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
+        }
+
+        const travelHistory = await TravelHistory.findOne({ userId: userIdObj });
+        if (!travelHistory || !travelHistory.destinations || travelHistory.destinations.length === 0) {
+            return res.json({ message: 'No travel history found' });
+        }
+
+        const firstTwoDestinations = travelHistory.destinations.slice(0, 2); // Get first two destinations
+        res.json(firstTwoDestinations);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
 
 async function getDestinationByUserIdAndDestinationId(req, res) {
     const userId = req.user.id; 
@@ -173,5 +196,6 @@ module.exports = {
     getDestinationByUserIdAndDestinationId, 
     getDestinationByUserIdAndDestinationName, 
     generateTravelRecommendation, 
-    addTravelHistory 
+    addTravelHistory, 
+    getFirstTwoDestinationsByUserId 
 };
