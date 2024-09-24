@@ -18,7 +18,7 @@ import { HotelSearchRequest, HotelResponse } from "@/types/travelHistory/types";
 import Image from 'next/image';
 // Ensure this import aligns with your component structure
 import React, { useState } from "react";
-
+import { Star, Container, Banknote } from "lucide-react";
 
 const Page = () => {
   const [searchParams, setSearchParams] = useState({
@@ -115,10 +115,11 @@ const Page = () => {
   };
 
   return (
-    <div className="mx-8">
+    <div>
       <SignedinNavBar />
+    <div className="mx-8">
       <div className="mx-auto bg-white p-4 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4">Hotel Search</h2>
+        <h2 className="text-3xl font-bold mb-8">Hotel Search</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
           <div className="flex flex-col">
@@ -286,7 +287,7 @@ const Page = () => {
         )}
 
         <Button className="mt-6 w-full" onClick={handleSearch}>
-          Search Hotels
+          {isLoading? "Searching..." :"Search Hotels"}
         </Button>
 
         {/* Display hotels */}
@@ -296,29 +297,36 @@ const Page = () => {
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
     {hotelData.hotels.map((hotel: any, index: number) => (
       <Card key={index} className="shadow-lg p-4">
-        <h3 className="font-bold text-lg">{hotel.name}</h3>
-        <p>{hotel.rate_per_night.lowest} per night</p>
-        {hotel.location_rating && <p>Location Rating: {hotel.location_rating}</p>}
-        {hotel.amenities && <p>Amenities: {hotel.amenities + " "}</p>}
-        {hotel.images && hotel.images.length > 0 ? (
+         {hotel.images && hotel.images.length > 0 ? (
           <Image
              src={`/proxyImage?url=${encodeURIComponent(hotel.images[0].thumbnail)}`}
             alt={hotel.name}
-            className="w-full h-auto rounded"
+            className="w-full h-auto rounded mb-2"
             layout="responsive" // You can change layout as needed
             width={500} // Adjust width
-            height={300} // Adjust height
+            height={300} 
+         
           />
         ) : (
           <div className="w-full h-auto rounded bg-gray-200 flex items-center justify-center">
             <span>No image available</span>
           </div>
         )}
+        
+        <h3 className="font-bold text-lg ">{hotel.name}</h3>
+       <div className="flex items-center mt-2 ">
+       <Banknote/>
+         <p className="ml-3">{hotel.rate_per_night.lowest} per night</p>
+        </div>
+        {hotel.location_rating && <div className="my-2 flex items-center"><p className=" font-semibold"><Star/> </p> <p className="ml-3"> {hotel.location_rating}</p></div>}
+        {hotel.amenities &&<div className="my-2 flex items-center"> <p className="font-semibold"><Container/> </p><p className="ml-3"> {hotel.amenities + " "}</p></div>}
+       
       </Card>
     ))}
   </div>
 )}
       </div>
+    </div>
     </div>
   );
 };
