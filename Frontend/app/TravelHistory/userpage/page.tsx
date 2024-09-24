@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useGetTwoTravelHistoryQuery, useGenerateRecommendationMutation } from "@/store/TravelHistory/travelHistoryApi";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 
 const Page = () => {
@@ -28,24 +28,32 @@ const Page = () => {
     setAllowGenerateButton(!allowGenerateButton);
   };
 
-  const handleGenerateRecommendation = async () => {
+  const handleGenerateRecommendation = () => {
     setIsGenerating(true);
 
-    try {
-      const response = await generateRecommendation({
-        customDescription: allowCustomDescription
-          ? customDescription
-          : undefined,
-      }).unwrap();
+    generateRecommendation({
+      customDescription: allowCustomDescription ? customDescription : undefined,
+    })
+      .unwrap()
+      .then((response) => {
+        const newRecommendation = response.reccomendation;
+        setRecommendation(newRecommendation);
 
-      setRecommendation(response.reccomendation);
-    } catch (err) {
-      console.error("Error generating recommendation:", err);
-    } finally {
-      setIsGenerating(false);
-    }
+        // Store recommendation in local storage, overwriting any existing value
+        localStorage.setItem("destination", newRecommendation);
+      })
+      .catch((err) => {
+        console.error("Error generating recommendation:", err);
+      })
+      .finally(() => {
+        setIsGenerating(false);
+      });
   };
-console.log(recommendation);
+
+
+
+  console.log(recommendation);
+
   return (
     <div>
       <SignedinNavBar />
@@ -84,14 +92,17 @@ console.log(recommendation);
                   ))}
                 </div>
               ) : (
-                <div className= "flex justify-between items-center my-2">
-                <p className="mr-5">No travel history found. Add travel History to get recommendation.</p>
-                <Link href="/TravelHistory/logging_page">   
-                <Button>     
-                  <Plus/>
-                  </Button>
-                </Link>
-                  </div>
+                <div className="flex justify-between items-center my-2">
+                  <p className="mr-5">
+                    No travel history found. Add travel History to get
+                    recommendation.
+                  </p>
+                  <Link href="/TravelHistory/logging_page">
+                    <Button>
+                      <Plus />
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -161,10 +172,17 @@ console.log(recommendation);
 
           {/* Display Recommendation */}
           {recommendation && (
+            <div>
             <div className="flex justify-center my-4">
               <div className="bg-gray-100 p-4 rounded-lg w-3/4 text-center">
                 <p>Recommended Destination: {recommendation}</p>
               </div>
+            </div>
+            <div className="flex justify-center mt-2">
+              <Link href="/TravelHistory/hotel-search">
+            <Button>Discover Hotels</Button>
+              </Link>
+            </div>
             </div>
           )}
         </div>

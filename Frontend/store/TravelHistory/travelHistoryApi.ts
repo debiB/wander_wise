@@ -1,7 +1,7 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-import{GetDestinationByUserIdAndDestinationIdResponse, GetDestinationByUserIdAndDestinationNameResponse,GenerateTravelRecommendationResponse,  GenerateTravelRecommendationRequest, AddTravelHistoryResponse,AddTravelHistoryRequest,Destination }  from "@/types/travelHistory/types"
+import{GetDestinationByUserIdAndDestinationIdResponse, GetDestinationByUserIdAndDestinationNameResponse,GenerateTravelRecommendationResponse,  GenerateTravelRecommendationRequest, AddTravelHistoryResponse,AddTravelHistoryRequest,Destination, HotelSearchRequest, HotelResponse }  from "@/types/travelHistory/types"
 export const travelAPI = createApi({
   reducerPath: 'travelAPI',
   baseQuery: fetchBaseQuery({
@@ -58,7 +58,19 @@ export const travelAPI = createApi({
         body,
       }),
     }),
+  fetchHotel: builder.mutation<HotelResponse, HotelSearchRequest>({
+  query: (body) => {
+    const destination = localStorage.getItem('destination'); // Fetching destination from localStorage
+    return {
+      url: '/fetchHotels',
+      method: 'POST',
+      body: { ...body, destination:destination },  // Adding destination to the request body
+    };
+  },
+}),
+
+    
   }),
 });
 
-export const {useAddTravelHistoryMutation, useGenerateRecommendationMutation, useGetAllTravelHistoryByIdQuery, useGetAllTravelHistoryNameQuery, useGetAllTravelHistoryQuery, useGetTwoTravelHistoryQuery} = travelAPI;
+export const {useAddTravelHistoryMutation, useGenerateRecommendationMutation, useGetAllTravelHistoryByIdQuery, useGetAllTravelHistoryNameQuery, useGetAllTravelHistoryQuery, useGetTwoTravelHistoryQuery, useFetchHotelMutation} = travelAPI;

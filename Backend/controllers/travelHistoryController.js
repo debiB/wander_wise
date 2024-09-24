@@ -140,9 +140,9 @@ async function generateTravelRecommendation(req, res) {
         let prompt;
 
         if (customDescription) {
-            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, with the following additional considerations: ${customDescription}, recommend one new travel destination. Do not add any extra text. Only give me the name of the place.`;
+            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, with the following additional considerations: ${customDescription}, recommend one new travel destination. Only provide the name of the place and do not recommend a location that is already in the travel history.`;
         } else {
-            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, recommend one new travel destination. Do not add any extra text. Only give me the name of the place.`;
+            prompt = `Based on the travel history of visiting ${formattedTravelHistory.map(item => `${item[0]} (Rating: ${item[1]}/5)`).join(", ")}, recommend one new travel destination. Do not add any extra text. Only provide the name of the place and do not recommend a location that is already in the travel history.`;
         }
 
         const response = await model.generateContent(prompt);
@@ -155,6 +155,72 @@ async function generateTravelRecommendation(req, res) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
+const axios = require('axios');
+
+async function fetchHotels(req, res) {
+    const { 
+        destination, 
+        check_in_date, 
+        check_out_date,
+        adults,
+        children,
+        children_ages,
+        sort_by,
+        min_price,
+        max_price,
+        rating,
+        special_offers,
+        vacation_rentals,
+        bedrooms,
+        bathrooms
+    } = req.body;
+
+    // Only checkin, checkout, and destination are required
+    if (!destination || !check_in_date || !check_out_date) {
+        return res.status(400).json({ message: 'Missing required parameters: destination, check_in_date, check_out_date' });
+    }
+
+    try {
+        // Create params object for the API call
+        const params = {
+            engine: 'google_hotels',
+            q: destination,
+            hl: 'en',
+            check_in_date: check_in_date,
+            check_out_date: check_out_date,
+            api_key: process.env.GOOGLE_HOTELS_API_KEY,
+            adults: adults || '1',  // Default to 1 adult if not provided
+            children: children || '0',
+            children_ages: children_ages || '',
+            min_price: min_price || '',
+            max_price: max_price || '',
+            rating: rating || '',
+            special_offers: special_offers || false,
+            vacation_rentals: vacation_rentals || false,
+            bedrooms: bedrooms || '',
+            bathrooms: bathrooms || ''
+        };
+
+        // Conditionally add `sort_by` only if it's provided
+        if (sort_by) {
+            params.sort_by = sort_by;
+        }
+
+        // Fetch data from the Google Hotels API
+        const hotelResponse = await axios.get('https://serpapi.com/search?engine=google_hotels', { params });
+
+        // Extract hotels from the response
+        const hotels = hotelResponse.data.properties || [];
+
+        // Return the hotel data as JSON
+        res.json({ hotels });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching hotels' });
+    }
+}
+
+
 
 async function addTravelHistory(req, res) {
     const userId = req.user.id; 
@@ -197,5 +263,6 @@ module.exports = {
     getDestinationByUserIdAndDestinationName, 
     generateTravelRecommendation, 
     addTravelHistory, 
-    getFirstTwoDestinationsByUserId 
+    getFirstTwoDestinationsByUserId, 
+    fetchHotels 
 };

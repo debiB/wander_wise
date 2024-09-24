@@ -12,5 +12,7 @@ router.get('/getTwoTravelHistory', travelHistoryController.getFirstTwoDestinatio
 router.get('/getAllTravelHistoryName', travelHistoryController.getDestinationByUserIdAndDestinationName);
 router.post('/generate-recommendation', travelHistoryController.generateTravelRecommendation);
 router.post('/addTravelHistory', travelHistoryController.addTravelHistory);
+router.post('/fetchHotels', travelHistoryController.fetchHotels);
+
 
 module.exports = router;
